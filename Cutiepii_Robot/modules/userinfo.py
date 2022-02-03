@@ -312,8 +312,7 @@ def info(update: Update, context: CallbackContext):
                     text += _stext.format("Admin")
     if user_id not in [bot.id, 777000, 1087968824]:
         userhp = hpmanager(user)
-        text += f"\n\n<b>Health:</b> <code>{userhp['earnedhp']}/{userhp['totalhp']}</code>\n[<i>{make_bar(int(userhp['percentage']))} </i>{userhp['percentage']}%]. [<a href='https://t.me/Black_Knights_Union/33'>?</a>]"
-
+        text += f"\n\n<b>Health:</b> <code>{userhp['earnedhp']}/{userhp['totalhp']}</code>\n[<i>{make_bar(int(userhp['percentage']))} </i>{userhp['percentage']}%]"
     try:
         spamwtc = sw.get_ban(int(user.id))
         if spamwtc:
@@ -347,11 +346,6 @@ def info(update: Update, context: CallbackContext):
          text += "\n\nCo-Owner Of A Bot. Queen Of @Awesome_RJ. Bot Name Inspired From 'Rabeeka'."
          disaster_level_present = True
 
-    if disaster_level_present:
-        text += ' [<a href="https://t.me/Black_Knights_Union/35">?</a>]'.format(
-            bot.username,
-        )
-
     try:
         user_member = chat.get_member(user.id)
         if user_member.status == "administrator":
@@ -376,23 +370,51 @@ def info(update: Update, context: CallbackContext):
     if INFOPIC:
         try:
             profile = context.bot.get_user_profile_photos(user.id).photos[0][-1]
-            context.bot.sendChatAction(chat.id, "upload_photo")
-            context.bot.send_photo(
-            chat.id,
-            photo=profile,
-            caption=(text),
-            parse_mode=ParseMode.HTML,            
-        )
+            _file = bot.get_file(profile["file_id"])
+            _file.download(f"{user.id}.png")
+
+            message.reply_document(
+                document=open(f"{user.id}.png", "rb"),
+                caption=(text),
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                "Health", url="https://t.me/KennedyProject/44"),
+                            InlineKeyboardButton(
+                                "Disaster", url="https://t.me/KennedyProject/43")
+                        ],
+                    ]
+                ),
+                parse_mode=ParseMode.HTML,
+            )
+
+            os.remove(f"{user.id}.png")
         # Incase user don't have profile pic, send normal text
         except IndexError:
             message.reply_text(
-                text, parse_mode=ParseMode.HTML)
+                text, 
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                "Health", url="https://t.me/Freia_Updates/9"),
+                            InlineKeyboardButton(
+                                "Disaster", url="https://t.me/Freia_Updates/5")
+                        ],
+                    ]
+                ),
+                parse_mode=ParseMode.HTML,
+                disable_web_page_preview=True
+            )
 
     else:
         message.reply_text(
-            text, parse_mode=ParseMode.HTML)
+            text, parse_mode=ParseMode.HTML,
+        )
 
     rep.delete()
+
 
 def about_me(update: Update, context: CallbackContext):
     bot, args = context.bot, context.args
